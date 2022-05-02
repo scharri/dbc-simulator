@@ -22,8 +22,9 @@ class DBCSender():
         if res == 'y':
             exit(1)
 
-    def _get_new_value(self, old_value: int, value_minimum: int, value_maximum: int, max_diff: int):
-        new_value = old_value + random.randint(max_diff/2*(-1), max_diff/2)
+    def _get_new_value(self, old_value: int, value_minimum: int, value_maximum: int):
+        max_diff = int(0.1 * value_maximum) # value range of 10% from maximum value
+        new_value = old_value + random.randint(int(max_diff/2)*(-1), int(max_diff/2))
         while new_value < value_minimum or new_value > value_maximum:
             new_value = old_value + random.randint(max_diff/2*(-1), max_diff/2)
         return new_value
@@ -44,8 +45,7 @@ class DBCSender():
                     for signal in message.signals:
                         data.update({signal.name: self._get_new_value(old_value=previous_data[message.name][signal.name], 
                                                                         value_minimum=signal.minimum, 
-                                                                        value_maximum=signal.maximum, 
-                                                                        max_diff=10)})
+                                                                        value_maximum=signal.maximum)})
 
                 previous_data.update({message.name: data})
                 msg = can.Message(arbitration_id=message.frame_id, data=message.encode(data))
